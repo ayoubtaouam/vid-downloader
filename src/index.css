@@ -11,3 +11,96 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --color-primary: #e50914;
+  --color-bg-light: #f8f9fa;
+  --color-bg-dark: #121212;
+  --color-surface-light: #ffffff;
+  --color-surface-dark: #1f1f1f;
+  --color-text-light: #212529;
+  --color-text-dark: #e0e0e0;
+  --color-border-light: #dee2e6;
+  --color-border-dark: #333;
+}
+
+[data-theme="dark"] {
+  --bs-body-bg: var(--color-bg-dark);
+  --bs-body-color: var(--color-text-dark);
+  --bs-border-color: var(--color-border-dark);
+  --bs-primary: var(--color-primary);
+}
+
+[data-theme="light"] {
+  --bs-body-bg: var(--color-bg-light);
+  --bs-body-color: var(--color-text-light);
+  --bs-border-color: var(--color-border-light);
+  --bs-primary: var(--color-primary);
+}
+
+/* Add this to index.css */
+.custom-input {
+  background-color: var(--color-surface-light);
+  color: var(--bs-body-color);
+  border: 1px solid var(--bs-border-color);
+}
+
+[data-theme="dark"] .custom-input {
+  background-color: var(--color-surface-dark);
+  color: var(--bs-body-color);
+}
+
+.custom-input::placeholder {
+  color: var(--bs-body-color);
+  opacity: 0.8; 
+}
+
+[data-theme="dark"] .custom-input::placeholder {
+  color: #e0e0e0;
+  opacity: 0.5;
+}
+
+.custom-input:disabled {
+  background-color: inherit !important;
+  color: inherit !important;
+  opacity: 1;
+}
+
+.error {
+  color: #e64951;
+}
+
+/* Dark mode switch color customization */
+.form-check-input[type="checkbox"]:checked {
+  background-color: #e6a5a5;       /* dark red */
+  border-color: #bb2d3b;           /* dark red */
+}
+
+/* Optional: make the unchecked switch also darker */
+.form-check-input {
+  background-color: #343a40;       /* dark gray for unchecked */
+  border-color: #343a40;
+}
+
+/* Optional: hide default blue focus ring */
+.form-check-input:focus {
+  box-shadow: none;
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0}
+  to { opacity: 1}
+}
+
+.fade-out {
+  animation: fadeOut 0.6s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from {opacity: 1}
+  to {opacity: 0}
+}
