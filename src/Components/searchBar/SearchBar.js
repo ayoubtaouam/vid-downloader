@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import triggerDownload from "../../Utility/Utility";
 import Spinner from 'react-bootstrap/Spinner';
+import FormatModal from "../modal/FormatModal";
 
 export default function SearchBar({darkMode}) {
     const [url, setUrl] = useState('');
@@ -9,6 +10,10 @@ export default function SearchBar({darkMode}) {
     const [showAlert, setShowAlert] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
     const [error, setError] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [formats, setFormats] = useState([]);
+    const [videoTitle, setVideoTitle] = useState('');
+    const [thumbnail, setThumbnail] = useState('');
     let isUrlEmpty = !url;
 
     useEffect(() => {
@@ -32,12 +37,39 @@ export default function SearchBar({darkMode}) {
     const handleChange = ({target}) => {
         setUrl(target.value);
     }
-    const handleClick = async () => {
+
+    const handleClickinfo = async () => {
+        setIsLoading(true);
+        setError('');
+        try {
+          const response = await fetch('http://localhost:8080/api/info', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ url })
+          });
+          if (!response.ok) {
+            throw new Error("Failed to fetch video info");
+          }
+          const data = await response.json();
+          setVideoTitle(data.title);
+          setFormats(data.formats);
+          setThumbnail(data.thumbnail);
+          setShowModal(true);
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+
+    const handleClickDownload = async (format) => {
+        setShowModal(false);
         setIsLoading(true);
         setShowAlert(false);
         setError('');
         try {    
-            const response = await fetch('http://localhost:8080/api/download', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({url})});
+            const response = await fetch('http://localhost:8080/api/download', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({url, formatId: format.formatId, videoTitle, extension: format.ext})});
             if (response.ok) {
                 const contentDisposition = response.headers.get("Content-Disposition");
                 console.log(contentDisposition);
@@ -63,10 +95,19 @@ export default function SearchBar({darkMode}) {
     }
     return (
         <>
+            <FormatModal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                formats={formats}
+                onSelectFormat={handleClickDownload}
+                videoTitle={videoTitle}
+                thumbnail={thumbnail}
+            />
+
             <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
                 <InputGroup size="lg" className="p-5 w-50">
                     <Form.Control value={url} type="text" placeholder="Enter link here" onChange={handleChange} disabled={isLoading} className="custom-input" />
-                    <Button disabled={isUrlEmpty || isLoading} variant="danger" onClick={handleClick}>
+                    <Button disabled={isUrlEmpty || isLoading} variant="danger" onClick={handleClickinfo}>
                         {isLoading ? <Spinner size="sm" animation="border" /> : "Download"}
                     </Button>
                 </InputGroup>
